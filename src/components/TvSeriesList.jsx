@@ -1,9 +1,9 @@
 import PropTypes from "prop-types";
-import { useState, useEffect } from "react";
-import MovieCard from "./MovieCard";
+import { useEffect, useState } from "react";
+import TvSeriesCard from "./TvSeriesCard";
 import MovieSkeleton from "./MovieSkeleton";
 
-const MovieList = ({ movies, onLoadMore, startIndex }) => {
+const TvSeriesList = ({ tvSeries, onLoadMore, startIndex }) => {
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -15,7 +15,7 @@ const MovieList = ({ movies, onLoadMore, startIndex }) => {
     return () => clearTimeout(timer);
   }, []);
 
-  const loadMoreMovies = () => {
+  const loadMoreTvSeries = () => {
     setPage((prevPage) => prevPage + 1);
     onLoadMore(page + 1, startIndex + 20);
   };
@@ -26,28 +26,30 @@ const MovieList = ({ movies, onLoadMore, startIndex }) => {
         ? Array.from({ length: 20 }).map((_, index) => (
             <MovieSkeleton key={index} className="animate-pulse" />
           ))
-        : movies
+        : tvSeries
             .slice(startIndex, startIndex + 20)
-            .map((movie) => <MovieCard key={movie.title} movie={movie} />)}
+            .map((tvSeries) => (
+              <TvSeriesCard key={tvSeries.name} tvSeries={tvSeries} />
+            ))}
 
-      <button className="btn-grad" onClick={loadMoreMovies}>
+      <button className="btn-grad" onClick={loadMoreTvSeries}>
         Load More
       </button>
     </div>
   );
 };
 
-MovieList.propTypes = {
-  movies: PropTypes.arrayOf(
+TvSeriesList.propTypes = {
+  tvSeries: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       poster_path: PropTypes.string,
-      title: PropTypes.string.isRequired,
-      release_date: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      first_air_date: PropTypes.string.isRequired,
     })
   ).isRequired,
   onLoadMore: PropTypes.func.isRequired,
   startIndex: PropTypes.number.isRequired,
 };
 
-export default MovieList;
+export default TvSeriesList;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import MovieList from "../components/MovieList";
+import TvSeriesList from "../components/TvSeriesList";
 import { BiChevronDown } from "react-icons/bi";
 import { RxValueNone } from "react-icons/rx";
 import {
@@ -38,28 +38,28 @@ const SORT_OPTIONS = [
   },
   {
     name: "Release Date: Old to New",
-    value: "release_date.asc",
+    value: "first_air_date.asc",
     icon: <HiOutlineSortAscending />,
   },
   {
     name: "Release Date: New to Old",
-    value: "release_date.desc",
+    value: "first_air_date.desc",
     icon: <HiOutlineSortDescending />,
   },
   {
     name: "Title: A-Z",
-    value: "title.asc",
+    value: "name.asc",
     icon: <HiOutlineSortAscending />,
   },
   {
     name: "Title: Z-A",
-    value: "title.desc",
+    value: "name.desc",
     icon: <HiOutlineSortDescending />,
   },
 ];
 
-const Home = () => {
-  const [movies, setMovies] = useState([]);
+const TvSeries = () => {
+  const [tvSeries, setTvSeries] = useState([]);
   const [filter, setFilter] = useState({
     sort: "none",
     genre: [],
@@ -71,10 +71,10 @@ const Home = () => {
   console.log(filter);
 
   const { refetch } = useQuery({
-    queryKey: ["movies", filter, page],
+    queryKey: ["tvSeries", filter, page],
     queryFn: async () => {
       const { data } = await axios.get(
-        "https://api.themoviedb.org/3/discover/movie",
+        "https://api.themoviedb.org/3/discover/tv",
         {
           params: {
             api_key: "27e5944c8fa4da41f3362a64acc866ff",
@@ -86,7 +86,7 @@ const Home = () => {
           },
         }
       );
-      setMovies(data.results);
+      setTvSeries(data.results);
       console.log(data.results);
       return {
         results: data.results,
@@ -98,7 +98,7 @@ const Home = () => {
   useEffect(() => {
     const fetchGenres = async () => {
       const { data } = await axios.get(
-        "https://api.themoviedb.org/3/genre/movie/list",
+        "https://api.themoviedb.org/3/genre/tv/list",
         {
           params: {
             api_key: "27e5944c8fa4da41f3362a64acc866ff",
@@ -113,7 +113,7 @@ const Home = () => {
 
   const onSubmit = () => refetch();
 
-  const loadMoreMovies = (page, startIndex) => {
+  const loadMoreTvSeries = (page, startIndex) => {
     setPage((prevPage) => prevPage + 1);
     setStartIndex((prevStartIndex) => prevStartIndex + 20);
     refetch({
@@ -128,7 +128,7 @@ const Home = () => {
     <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
       <div className="flex items-baseline justify-between border-b border-gray-200 pb-6">
         <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-          Popular Movies
+          Popular TV Shows
         </h1>
 
         <div>
@@ -176,7 +176,7 @@ const Home = () => {
                   <li key={genre.id}>
                     <button
                       className={cn(
-                        "px-2 py-1 w-full rounded-full text-[12px] flex justify-center items-center",
+                        "px-2 py-1 rounded-full text-[12px] w-full flex justify-center items-center",
                         filter.genre === genre.id && "text-blue-500"
                       )}
                       onClick={() => {
@@ -197,9 +197,9 @@ const Home = () => {
           </div>
         </div>
         <div className="lg:col-span-3">
-          <MovieList
-            movies={movies}
-            onLoadMore={loadMoreMovies}
+          <TvSeriesList
+            tvSeries={tvSeries}
+            onLoadMore={loadMoreTvSeries}
             startIndex={startIndex}
           />
         </div>
@@ -208,4 +208,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default TvSeries;
