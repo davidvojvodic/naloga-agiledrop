@@ -8,7 +8,9 @@ import {
   HiOutlineSortDescending,
 } from "react-icons/hi";
 import { cn } from "../utils/utils";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
+import GenreFilter from "../components/GenreFilter";
+import EmptyState from "../components/EmptyState";
 
 const SORT_OPTIONS = [
   {
@@ -59,41 +61,45 @@ const SORT_OPTIONS = [
 ];
 
 const TvSeries = () => {
-  const [tvSeries, setTvSeries] = useState([]);
   const [filter, setFilter] = useState({
     sort: "none",
     genre: [],
   });
   const [genres, setGenres] = useState([]);
-  const [page, setPage] = useState(1);
-  const [startIndex, setStartIndex] = useState(0);
 
   console.log(filter);
 
-  const { refetch } = useQuery({
-    queryKey: ["tvSeries", filter, page],
-    queryFn: async () => {
-      const { data } = await axios.get(
-        "https://api.themoviedb.org/3/discover/tv",
-        {
-          params: {
-            api_key: "27e5944c8fa4da41f3362a64acc866ff",
-            language: "en-US",
-            sort_by: filter.sort,
-            with_genres: filter.genre,
-            page: page,
-            start_index: startIndex,
-          },
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ["tvSeries", filter],
+      queryFn: async ({ pageParam = 1 }) => {
+        const { data } = await axios.get(
+          "https://api.themoviedb.org/3/discover/tv",
+          {
+            params: {
+              api_key: "27e5944c8fa4da41f3362a64acc866ff",
+              language: "en-US",
+              sort_by: filter.sort,
+              with_genres: filter.genre.join(", "),
+              page: pageParam,
+            },
+          }
+        );
+
+        return {
+          results: data.results,
+          pageCount: data.total_pages,
+          page: pageParam,
+        };
+      },
+      getNextPageParam: (lastPage) => {
+        if (lastPage.page < lastPage.pageCount) {
+          return lastPage.page + 1;
         }
-      );
-      setTvSeries(data.results);
-      console.log(data.results);
-      return {
-        results: data.results,
-        pageCount: data.total_pages,
-      };
-    },
-  });
+        return undefined;
+      },
+      placeholderData: keepPreviousData,
+    });
 
   useEffect(() => {
     const fetchGenres = async () => {
@@ -111,18 +117,27 @@ const TvSeries = () => {
     fetchGenres();
   }, []);
 
-  const onSubmit = () => refetch();
-
-  const loadMoreTvSeries = (page, startIndex) => {
-    setPage((prevPage) => prevPage + 1);
-    setStartIndex((prevStartIndex) => prevStartIndex + 20);
-    refetch({
-      page: page,
-      with_genres: filter.genre,
-      sort_by: filter.sort,
-      startIndex: startIndex + 20,
-    });
+  const handleFilterChange = (genreId, isChecked) => {
+    if (isChecked) {
+      setFilter((prevFilter) => ({
+        ...prevFilter,
+        genre: [...prevFilter.genre, genreId],
+      }));
+    } else {
+      setFilter((prevFilter) => ({
+        ...prevFilter,
+        genre: prevFilter.genre.filter((id) => id !== genreId),
+      }));
+    }
   };
+
+  const handleSubmit = () => {
+    fetchNextPage();
+  };
+
+  useEffect(() => {
+    handleSubmit();
+  }, [filter]);
 
   return (
     <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -152,8 +167,6 @@ const TvSeries = () => {
                         ...prev,
                         sort: option.value,
                       }));
-
-                      onSubmit();
                     }}
                   >
                     {option.icon}
@@ -165,43 +178,69 @@ const TvSeries = () => {
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4 mt-10">
-        <div className="hidden lg:block">
-          <div className="collapse collapse-arrow justify-center border">
-            <input type="checkbox" className="peer" />
-            <div className="collapse-title text-lg font-medium">Genres</div>
-            <div className="collapse-content">
-              <ul className="flex flex-wrap p-0 gap-2 w-56 bg-base-100 text-base-content">
-                {genres.map((genre) => (
-                  <li key={genre.id}>
-                    <button
-                      className={cn(
-                        "px-2 py-1 rounded-full text-[12px] w-full flex justify-center items-center",
-                        filter.genre === genre.id && "text-blue-500"
-                      )}
-                      onClick={() => {
-                        setFilter((prev) => ({
-                          ...prev,
-                          genre: genre.id,
-                        }));
-
-                        onSubmit();
-                      }}
-                    >
-                      {genre.name}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
+      <div className="lg:hidden mt-2">
+        <div className="collapse collapse-arrow justify-center border">
+          <input type="checkbox" className="peer" />
+          <div className="collapse-title text-lg font-medium border-b-2 border">
+            Filters
+          </div>
+          <div className="collapse-content flex flex-col w-full">
+            <h2 className="font-semibold text-left mb-4">Genres</h2>
+            <ul className="flex flex-wrap p-0 gap-2 w-full bg-base-100 text-base-content">
+              {genres.map((genre) => (
+                <li
+                  key={genre.id}
+                  className={cn(
+                    "border px-2 py-1 rounded-full hover:bg-blue-100 hover:border-blue-300 hover:text-blue-500",
+                    {
+                      "bg-blue-100 border-blue-300 text-blue-500 font-semibold":
+                        filter.genre.includes(genre.id),
+                      "bg-base-100 border-base-300 text-base-content":
+                        !filter.genre.includes(genre.id),
+                    }
+                  )}
+                >
+                  <label className="inline-flex items-center">
+                    <input
+                      type="checkbox"
+                      className="hidden"
+                      name="genre"
+                      value={genre.id}
+                      checked={filter.genre.includes(genre.id)}
+                      onChange={(e) =>
+                        handleFilterChange(genre.id, e.target.checked)
+                      }
+                    />
+                    <span className="cursor-pointer">{genre.name}</span>
+                  </label>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
+      </div>
+      <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4 mt-10">
+        <div className="hidden lg:block">
+          <GenreFilter genres={genres} filter={filter} setFilter={setFilter} />
+        </div>
         <div className="lg:col-span-3">
+          {data?.pages.flatMap((page) => page.results).length === 0 && (
+            <EmptyState />
+          )}
           <TvSeriesList
-            tvSeries={tvSeries}
-            onLoadMore={loadMoreTvSeries}
-            startIndex={startIndex}
+            tvSeries={data?.pages.flatMap((page) => page.results)}
           />
+          <button
+            onClick={() => {
+              if (hasNextPage) {
+                fetchNextPage();
+              }
+            }}
+            disabled={!hasNextPage || isFetchingNextPage}
+            className="mt-6 btn btn-primary w-full"
+          >
+            {isFetchingNextPage ? "Loading..." : "Load More"}
+          </button>
         </div>
       </div>
     </main>

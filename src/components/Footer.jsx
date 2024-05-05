@@ -1,10 +1,10 @@
 const Footer = () => {
   return (
     <footer className="footer p-10 bg-[#032541] text-base-content">
-      <div className="container text-white items-start px-4 sm:px-6 lg:px-8 mx-auto flex justify-between">
+      <div className="container text-white items-start px-4 sm:px-6 lg:px-8 mx-auto flex flex-col lg:flex-row justify-between">
         <aside>
           <img src="/footer.svg" alt="Logo" width={130} height={94} />
-          <button className="btn btn-primary mt-10">JOIN THE COMMUNITY</button>
+          <button className="btn btn-primary my-10">JOIN THE COMMUNITY</button>
         </aside>
         <nav className="flex flex-col text-left gap-2">
           <h6 className="footer-title">THE BASICS</h6>

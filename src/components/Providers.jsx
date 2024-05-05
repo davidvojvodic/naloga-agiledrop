@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import React from "react";
+import PropTypes from "prop-types";
 
 const client = new QueryClient();
 
@@ -8,7 +8,7 @@ const Providers = ({ children }) => {
 };
 
 Providers.propTypes = {
-  children: React.ReactNode,
+  children: PropTypes.node,
 };
 
 export default Providers;

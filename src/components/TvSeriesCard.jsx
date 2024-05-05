@@ -1,5 +1,4 @@
 import PropTypes from "prop-types";
-import { format } from "date-fns";
 import { CiMenuKebab } from "react-icons/ci";
 import { FaArrowRight } from "react-icons/fa";
 import { cn } from "../utils/utils";
@@ -90,6 +89,7 @@ TvSeriesCard.propTypes = {
     poster_path: PropTypes.string,
     name: PropTypes.string.isRequired,
     first_air_date: PropTypes.string.isRequired,
+    vote_average: PropTypes.number.isRequired,
   }).isRequired,
 };
 

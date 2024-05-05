@@ -3,8 +3,7 @@ import { useState, useEffect } from "react";
 import MovieCard from "./MovieCard";
 import MovieSkeleton from "./MovieSkeleton";
 
-const MovieList = ({ movies, onLoadMore, startIndex }) => {
-  const [page, setPage] = useState(1);
+const MovieList = ({ movies }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -15,24 +14,13 @@ const MovieList = ({ movies, onLoadMore, startIndex }) => {
     return () => clearTimeout(timer);
   }, []);
 
-  const loadMoreMovies = () => {
-    setPage((prevPage) => prevPage + 1);
-    onLoadMore(page + 1, startIndex + 20);
-  };
-
   return (
-    <div className="flex flex-wrap gap-6">
+    <div className="flex flex-wrap justify-center gap-6">
       {isLoading
         ? Array.from({ length: 20 }).map((_, index) => (
             <MovieSkeleton key={index} className="animate-pulse" />
           ))
-        : movies
-            .slice(startIndex, startIndex + 20)
-            .map((movie) => <MovieCard key={movie.title} movie={movie} />)}
-
-      <button className="btn-grad" onClick={loadMoreMovies}>
-        Load More
-      </button>
+        : movies.map((movie) => <MovieCard key={movie.id} movie={movie} />)}
     </div>
   );
 };
@@ -44,10 +32,9 @@ MovieList.propTypes = {
       poster_path: PropTypes.string,
       title: PropTypes.string.isRequired,
       release_date: PropTypes.string.isRequired,
+      vote_average: PropTypes.number.isRequired,
     })
-  ).isRequired,
-  onLoadMore: PropTypes.func.isRequired,
-  startIndex: PropTypes.number.isRequired,
+  ),
 };
 
 export default MovieList;

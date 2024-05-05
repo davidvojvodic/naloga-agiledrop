@@ -2,13 +2,12 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import "./App.css";
 
-// import Movies from "./pages/Movies";
-import Home from "./pages/Home";
-
 import TvSeries from "./pages/Tv";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import HomePage from "./pages/HomePage";
+import Movies from "./pages/Movies";
+import People from "./pages/People";
 
 function App() {
   return (
@@ -16,8 +15,9 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/movies" element={<Home />} />
+        <Route path="/movies" element={<Movies />} />
         <Route path="/tv" element={<TvSeries />} />
+        <Route path="/people" element={<People />} />
       </Routes>
       <Footer />
     </BrowserRouter>

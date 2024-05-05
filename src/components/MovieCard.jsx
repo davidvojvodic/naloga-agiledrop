@@ -1,4 +1,3 @@
-import { format } from "date-fns";
 import PropTypes from "prop-types";
 import { cn } from "../utils/utils";
 import { CiMenuKebab } from "react-icons/ci";
@@ -17,7 +16,7 @@ const MovieCard = ({ movie }) => {
   }
 
   return (
-    <div className="card p-0 w-48 bg-base-100 shadow-xl relative">
+    <div className="card hover:scale-105 transition cursor-pointer p-0 w-48 bg-base-100 shadow-xl relative">
       <div className="dropdown dropdown-hover dropdown-end absolute top-1 right-2 z-10 ">
         <div
           tabIndex={0}
