@@ -12,6 +12,7 @@ import { useInfiniteQuery, keepPreviousData } from "@tanstack/react-query";
 import GenreFilter from "../components/GenreFilter";
 import EmptyState from "../components/EmptyState";
 
+// Array z objekti, ki predstavljajo možnosti za razvrstitev filmov
 const SORT_OPTIONS = [
   {
     name: "None",
@@ -62,13 +63,14 @@ const SORT_OPTIONS = [
 
 const Movies = () => {
   const [filter, setFilter] = useState({
-    sort: "none",
-    genre: [],
+    sort: "none", // Vrstni red filmov
+    genre: [], // Seznam izbranih žanrov
   });
   const [genres, setGenres] = useState([]);
 
   console.log(filter);
 
+  // Uporaba hooka useInfiniteQuery od tanstack query
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
       queryKey: ["movies", filter],
@@ -102,6 +104,7 @@ const Movies = () => {
       placeholderData: keepPreviousData,
     });
 
+  // Uporaba useEffect za nalaganje žanrov
   useEffect(() => {
     const fetchGenres = async () => {
       const { data } = await axios.get(
@@ -117,6 +120,7 @@ const Movies = () => {
     fetchGenres();
   }, []);
 
+  // Funkcija za spreminjanje filterjev
   const handleFilterChange = (genreId, isChecked) => {
     if (isChecked) {
       setFilter((prevFilter) => ({
@@ -135,6 +139,7 @@ const Movies = () => {
     fetchNextPage();
   };
 
+  // Uporaba React hooka useEffect za nalaganje novih podatkov
   useEffect(() => {
     handleSubmit();
   }, [filter]);
@@ -148,6 +153,7 @@ const Movies = () => {
 
         <div>
           <div className="dropdown dropdown-end dropdown-hover">
+            {/* Sortiranje filmov */}
             <div tabIndex={0} role="button" className="m-1 btn">
               Sort <BiChevronDown className="-mr-1 w-5 h-5" />
             </div>
@@ -221,9 +227,11 @@ const Movies = () => {
       </div>
       <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4 mt-10">
         <div className="hidden lg:block">
+          {/* Filter komponenta */}
           <GenreFilter genres={genres} filter={filter} setFilter={setFilter} />
         </div>
         <div className="lg:col-span-3">
+          {/* Komponenta brez rezultatov in movie list */}
           {data?.pages.flatMap((page) => page.results).length === 0 && (
             <EmptyState />
           )}

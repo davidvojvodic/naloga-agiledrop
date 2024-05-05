@@ -7,6 +7,7 @@ const Navbar = () => {
       <input id="drawer" type="checkbox" className="drawer-toggle" />
       <div className="drawer-content flex flex-col">
         <nav className="bg-[#032541] navbar p-4">
+          {/* Menu za mobile view */}
           <div className="flex-none lg:hidden">
             <label
               htmlFor="drawer"
@@ -30,6 +31,7 @@ const Navbar = () => {
           </div>
           <div className="container px-4 sm:px-6 lg:px-8 mx-auto flex justify-between items-center">
             <div className="flex-1 flex">
+              {/* Navbar desktop */}
               <Link to="/" className="flex items-center">
                 <img src="/logo.svg" alt="Logo" width={154} height={20} />
               </Link>
@@ -122,6 +124,7 @@ const Navbar = () => {
           className="drawer-overlay"
         ></label>
         <ul className="menu p-4 w-80 min-h-full bg-base-200 gap-y-4">
+          {/* Navbar mobile */}
           <div className="form-control">
             <input
               type="text"

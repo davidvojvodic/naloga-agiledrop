@@ -3,7 +3,10 @@ import { cn } from "../utils/utils";
 
 const MovieSkeleton = ({ className }) => {
   return (
-    <div className={cn("card p-0 w-48 bg-base-100 shadow-xl", className)}>
+    <div
+      data-testid="movie-skeleton"
+      className={cn("card p-0 w-48 bg-base-100 shadow-xl", className)}
+    >
       <figure>
         <div className="h-72 bg-gray-300 animate-pulse rounded-t-md shadow-md" />
       </figure>

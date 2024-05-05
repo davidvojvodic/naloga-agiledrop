@@ -6,6 +6,7 @@ import MovieSkeleton from "./MovieSkeleton";
 const MovieList = ({ movies }) => {
   const [isLoading, setIsLoading] = useState(true);
 
+  // Uporaba setTimeout za simulacijo nalaganja skeletona
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
